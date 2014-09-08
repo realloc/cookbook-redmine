@@ -1,0 +1,5 @@
+default['redmine']['install_type'] = 'tarball'
+default['redmine']['tarball_url'] = 'http://www.redmine.org/releases/redmine-2.5.2.tar.gz'
+default['redmine']['app_path'] = '/srv/www/redmine'
+default['redmine']['owner'] = 'www-data'
+default['redmine']['group'] = 'www-data'
