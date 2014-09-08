@@ -1,13 +1,15 @@
-default['redmine']['install_type'] = 'tarball' # tarball | git
 default['redmine']['tarball_url'] = 'http://www.redmine.org/releases/redmine-2.5.2.tar.gz'
 default['redmine']['app_path'] = '/srv/www/redmine'
 default['redmine']['app_name'] = 'redmine'
 default['redmine']['owner'] = 'www-data'
 default['redmine']['group'] = 'www-data'
-default['redmine']['db_type'] = 'mysql' # mysql | postgree | sqlite | none
-default['redmine']['rails_version'] = '3.2'
 default['redmine']['unicorn_conf']['pid'] = '/var/run/unicorn.pid'
 default['redmine']['unicorn_conf']['sock'] = '/var/run/unicorn.sock'
 default['redmine']['unicorn_conf']['error_log'] = 'unicorn.error.log'
 default['redmine']['unicorn_conf']['access_log'] = 'unicorn.access.log'
-default['redmine']['db']['rails_env'] = 'production'
+default['redmine']['rails_env'] = 'production'
+default['redmine']['db']['db_name'] = 'redmine'
+default['redmine']['db']['db_host'] = 'localhost'
+default['redmine']['db']['db_user'] = 'root'
+default['redmine']['db']['db_pass'] = ''
+

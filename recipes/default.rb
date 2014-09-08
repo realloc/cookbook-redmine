@@ -45,7 +45,6 @@ template "#{node['redmine']['app_path']}/config/unicorn.rb" do
   notifies :reload, 'service[unicorn_redmine]', :delayed
 end
 
-# fix ownership for public/plugin_assets due to deployment order
 directory "#{node['redmine']['app_path']}/public/plugin_assets" do
   owner node['redmine']['owner']
   group node['redmine']['group']
@@ -64,7 +63,7 @@ template "#{node['redmine']['app_path']}/Gemfile.local" do
   source "Gemfile.local.erb"
   owner node['redmine']['owner']
   group node['redmine']['group']
-  mode "0755"
+  mode "0744"
 end
   
 bash "bundle install" do

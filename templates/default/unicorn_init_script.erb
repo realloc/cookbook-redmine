@@ -24,7 +24,7 @@ set -e    # exit with error from script if any line errors
 declare -r APP_NAME="<%=node['redmine']['app_name']%>"
 declare -r APP_ROOT="<%=node['redmine']['app_path']%>"
 declare -r PID="$APP_ROOT<%=node['redmine']['unicorn_conf']['pid']%>"
-declare -r ENV="<%=node['redmine']['db']['rails_env']%>"
+declare -r ENV="<%=node['redmine']['rails_env']%>"
 declare -r UNICORN_OPTS="-D -E $ENV -c $APP_ROOT/config/unicorn.rb"
 declare -r oldpid="$PID.oldbin"
 declare -r USER="<%=node['redmine']['owner']%>"
@@ -33,7 +33,7 @@ cd $APP_ROOT || exit 1
 
 run () {
 # ensures that master process is also www-data, not root
-  su -c "cd $APP_ROOT && bundle exec unicorn_rails $UNICORN_OPTS" $USER
+  sudo -u $USER -i bash -c 'cd <%=node['redmine']['app_path']%> && bundle exec unicorn_rails -D -E <%=node['redmine']['rails_env']%> -c <%=node['redmine']['app_path']%>/config/unicorn.rb <%=node['redmine']['owner']%>'
 }
 
 sig () {
