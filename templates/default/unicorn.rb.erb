@@ -1,0 +1,30 @@
+# managed by chef
+# see http://unicorn.bogomips.org/Unicorn/Configurator.html
+
+worker_processes 2
+working_directory "<%= node['redmine']['app_path'] %>"
+user "<%= node['redmine']['owner'] %>", "<%= node['redmine']['group'] %>"
+ 
+preload_app true
+
+timeout 30
+
+listen "<%= node['redmine']['unicorn_conf']['sock'] %>", :backlog => 64
+
+# helpful for debugging
+# listen 9090, :tcp_nopush => true
+
+pid "<%= node['redmine']['unicorn_conf']['pid'] %>"
+
+stderr_path "<%= "#{node['redmine']['app_path']}/#{node['redmine']['unicorn_conf']['error_log']}" %>"
+stdout_path "<%= "#{node['redmine']['app_path']}/#{node['redmine']['unicorn_conf']['access_log']}"%>"
+
+before_fork do |server, worker|
+  defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
+end
+
+after_fork do |server, worker|
+  defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
+end
+
+# see http://unicorn.bogomips.org/examples/unicorn.conf.rb

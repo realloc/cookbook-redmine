@@ -1,0 +1,85 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides: unicorn4redmine 
+# Required-Start: $all
+# Required-Stop: $network $local_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start the APPLICATION unicorns at boot
+# Description: Enable unicorn4redmine at boot time.
+### END INIT INFO
+
+# see http://unicorn.bogomips.org/SIGNALS.html
+# see https://gist.github.com/johntdyer/2814835
+# see http://refspecs.linuxbase.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+
+set -u    # force bash to throw error if using undefined variable
+
+# NOTE: "set -e" is incompatible when using /lib/lsb/init-functions, 
+#  see http://refspecs.linuxbase.org/LSB_3.1.0/LSB-Core-generic/LSB-Core-generic/iniscrptfunc.html
+set -e    # exit with error from script if any line errors
+
+#declare -r REDMINE_RUBY="<%=node['redmine']['ruby']%>"
+declare -r APP_NAME="<%=node['redmine']['app_name']%>"
+declare -r APP_ROOT="<%=node['redmine']['app_path']%>"
+declare -r PID="$APP_ROOT<%=node['redmine']['unicorn_conf']['pid']%>"
+declare -r ENV="<%=node['redmine']['db']['rails_env']%>"
+declare -r UNICORN_OPTS="-D -E $ENV -c $APP_ROOT/config/unicorn.rb"
+declare -r oldpid="$PID.oldbin"
+declare -r USER="<%=node['redmine']['owner']%>"
+
+cd $APP_ROOT || exit 1
+
+run () {
+# ensures that master process is also www-data, not root
+  su -c "cd $APP_ROOT && bundle exec unicorn_rails $UNICORN_OPTS" $USER
+}
+
+sig () {
+  test -s "$PID" && kill -$1 `cat $PID`
+}
+
+oldsig() {
+  test -s "$oldpid" && kill -$1 `cat $oldpid`
+}
+
+case ${1-help} in
+    status)
+        sig 0 && echo "[Unicorn @ Redmine] running in $APP_ROOT pid `cat $PID` " && exit 0
+        echo "[Unicorn @ Redmine] stopped" && test -s "$PID" && exit 1 || exit 3
+    ;;
+    start)
+        sig 0 && echo >&2 "[Unicorn @ redmine] already running" && exit 0
+        run && echo "[Unicorn @ Redmine] now up and running - OK"
+    ;;
+    stop)
+        sig QUIT && echo "[Unicorn @ Redmine] stopped - OK" || echo >&2 "[Unicorn @ Redmine] already stopped"
+    ;;
+    force-stop)
+        sig TERM && exit 0
+        echo >&2 "Not running"
+    ;;
+    restart)
+        sig 0 && ( sig QUIT && echo '[Unicorn @ Redmine] stopped - OK' && sleep 1 ) || echo '[Unicorn @ Redmine] already stopped'
+        echo '[Unicorn @ Redmine] restarting ...'
+        run
+      #
+      #  test -e "$PID" || (echo "[Unicorn @ Redmine] is apparently not running"  && exit 0 )
+      #  sig QUIT && echo "[Unicorn @ Redmine] restarting - OK" && sleep 3 && run && echo "[Unicorn @ Redmine] now up and running - OK" && exit 0
+    ;;
+    
+    reload|force-reload)
+        # assumes unicorn.rb specifies preload_app = true; otherwise should use HUP
+        sig 0 && sig USR2 && sleep 1 && oldsig QUIT && echo "[Unicorn @ Redmine] reloaded - OK" && exit 0
+        echo >&2 "[Unicorn @ Redmine] couldn't reload, restart required" && exit 1
+    ;;
+    rotate)
+        sig USR1 && echo "[Unicorn @ Redmine] rotated logs - OK" && exit 0
+        echo >&2 "[Unicorn @ Redmine] couldn't rotate logs" && exit 1
+    ;;
+    *)
+        echo "Usage: $0 <status|start|stop|restart|reload|force-reload|rotate|force-stop>"
+        exit 1
+    ;;
+esac
