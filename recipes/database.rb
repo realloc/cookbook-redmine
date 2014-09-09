@@ -3,8 +3,7 @@
 # Recipe:: database
 #
 
-include_recipe "mysql::server"
-include_recipe "mysql::ruby"
+chef_gem 'mysql2'
 
 mysql_root_connection_info = {
   :host => node['redmine']['db']['db_host'],
