@@ -3,8 +3,6 @@
 # Recipe:: database
 #
 
-chef_gem 'mysql2'
-
 mysql_root_connection_info = {
   :host => node['redmine']['db']['db_host'],
   :username => node['redmine']['db']['db_root'],
