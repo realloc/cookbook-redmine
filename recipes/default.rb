@@ -22,7 +22,7 @@ service "unicorn_redmine" do
 end
 
 template "/etc/init.d/unicorn_redmine" do
-  source "unicorn_init_script.erb"
+  source "unicorn_init.erb"
   owner  "root"
   group  "root"
   mode   "0755"
