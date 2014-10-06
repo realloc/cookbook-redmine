@@ -5,6 +5,7 @@
 
 directory node['redmine']['app_path'] do
   action :create
+  recursive true
   owner node['redmine']['owner']
   group node['redmine']['group']
 end
@@ -46,6 +47,7 @@ template "#{node['redmine']['app_path']}/config/unicorn.rb" do
 end
 
 directory "#{node['redmine']['app_path']}/public/plugin_assets" do
+  recursive true
   owner node['redmine']['owner']
   group node['redmine']['group']
   mode  "0755"
