@@ -35,11 +35,15 @@ bash "rake_task:generate_secret_token" do
   code "sudo -i -u #{node['redmine']['rvm_user']} bash -c 'cd #{node['redmine']['app_path']} && rake generate_secret_token'"
 end
 
-# expression to check if DB is empty. We assume that if the settings table exists, nonempty.
+# expression to check if DB is empty. We assume that if the settings table exists then it's not empty.
 db_user = node['redmine']['db']['db_user']
 db_pass = node['redmine']['db']['db_pass']
 db_name = node['redmine']['db']['db_name']
-mysql_client_cmd = "mysql -u #{db_user} -p#{db_pass} #{db_name}"
+
+mysql_client_cmd = "mysql -u #{db_user} "
+mysql_client_cmd += "-p#{db_pass} " if db_pass.lenght
+mysql_client_cmd += db_name
+
 mysql_empty_check_cmd = "echo 'SHOW TABLES' | #{mysql_client_cmd} | wc -l | xargs test 0 -eq"
 
 bash "rake_task: db:migrate and other initialization" do
