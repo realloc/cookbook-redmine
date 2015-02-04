@@ -41,7 +41,7 @@ db_pass = node['redmine']['db']['db_pass']
 db_name = node['redmine']['db']['db_name']
 
 mysql_client_cmd = "mysql -u #{db_user} "
-mysql_client_cmd += "-p#{db_pass} " if db_pass.lenght
+mysql_client_cmd += "-p#{db_pass} " if db_pass.length
 mysql_client_cmd += db_name
 
 mysql_empty_check_cmd = "echo 'SHOW TABLES' | #{mysql_client_cmd} | wc -l | xargs test 0 -eq"
