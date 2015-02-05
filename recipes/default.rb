@@ -27,7 +27,7 @@ template "/etc/init.d/unicorn_redmine" do
   owner  "root"
   group  "root"
   mode   "0755"
-  notifies :reload, "service[unicorn_redmine]"
+  notifies :restart "service[unicorn_redmine]"
 end
 
 template "#{node['redmine']['app_path']}/config/configuration.yml" do
@@ -35,7 +35,7 @@ template "#{node['redmine']['app_path']}/config/configuration.yml" do
   owner node['redmine']['owner']
   group node['redmine']['group']
   mode  '0644'
-  notifies :reload, 'service[unicorn_redmine]', :delayed
+  notifies :restart, 'service[unicorn_redmine]', :delayed
 end
 
 template "#{node['redmine']['app_path']}/config/unicorn.rb" do
@@ -43,7 +43,7 @@ template "#{node['redmine']['app_path']}/config/unicorn.rb" do
   owner node['redmine']['owner']
   group node['redmine']['group']
   mode  '0644'
-  notifies :reload, 'service[unicorn_redmine]', :delayed
+  notifies :restart, 'service[unicorn_redmine]', :delayed
 end
 
 directory "#{node['redmine']['app_path']}/public/plugin_assets" do
