@@ -27,7 +27,7 @@ template "/etc/init.d/unicorn_redmine" do
   owner  "root"
   group  "root"
   mode   "0755"
-  notifies :restart "service[unicorn_redmine]"
+  notifies :restart 'service[unicorn_redmine]'
 end
 
 template "#{node['redmine']['app_path']}/config/configuration.yml" do
